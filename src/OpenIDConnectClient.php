@@ -568,7 +568,7 @@ class OpenIDConnectClient
             return false;
         }
         // Validate the iat. At this point we can return true if it is ok
-        if (isset($claims->exp) && ((is_int($claims->exp)) && ($claims->exp <= time() + $this->leeway))) {
+        if (isset($claims->exp) && ((is_int($claims->exp)) && ($claims->exp >= time() + $this->leeway))) {
             return true;
         }
 
