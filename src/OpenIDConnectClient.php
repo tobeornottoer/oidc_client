@@ -563,8 +563,8 @@ class OpenIDConnectClient
         if (!$this->validateIssuer($claims->iss)) {
             return false;
         }
-        // Validate the aud
-        if ((!$claims->aud === $this->clientID) || (!in_array($this->clientID, $claims->aud, true))) {
+        // Validate the clientId
+        if (!isset($claims->client_id) || $claims->client_id !== $this->clientID){
             return false;
         }
         // Validate the iat. At this point we can return true if it is ok
@@ -2278,5 +2278,29 @@ class OpenIDConnectClient
         }
 
         return in_array($auth_method, $token_endpoint_auth_methods_supported, true);
+    }
+
+    public function verifyAccessToken($token){
+        if(!empty($token)){
+            $claims = $this->decodeJWT($token, 1);
+            // Verify the signature
+            if ($this->canVerifySignatures()) {
+                if (!$this->getProviderConfigValue('jwks_uri')) {
+                    throw new OpenIDConnectClientException('Check token: Unable to verify signature due to no jwks_uri being defined');
+                }
+                if (!$this->verifyJWTsignature($token)) {
+                    throw new OpenIDConnectClientException('Check token: Unable to verify JWT signature');
+                }
+            } else {
+                user_error('Warning: JWT signature verification unavailable');
+            }
+            if ($this->verifyLogoutTokenClaims($claims)) {
+                $this->verifiedClaims = $claims;
+                return true;
+            }
+            return false;
+        }
+
+        throw new OpenIDConnectClientException('Check token: There was empty token in the request');
     }
 }

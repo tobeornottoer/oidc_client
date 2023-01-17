@@ -1,6 +1,6 @@
 {
-    "name": "jumbojett/openid-connect-php",
-    "description": "Bare-bones OpenID Connect client",
+    "name": "mt/oidc_client",
+    "description": "用于对接统一身份验证",
     "license": "Apache-2.0",
     "require": {
         "php": ">=5.4",
